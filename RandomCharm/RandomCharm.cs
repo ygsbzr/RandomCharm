@@ -8,7 +8,7 @@ namespace RandomCharm
     {
         public override string GetVersion()
         {
-            return "1.0";
+            return "1.1";
         }
         private readonly System.Random _rand = new();
         private List<int> collectCharms = new();
