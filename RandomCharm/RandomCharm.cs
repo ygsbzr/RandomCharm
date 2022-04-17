@@ -8,7 +8,7 @@ namespace RandomCharm
     {
         public override string GetVersion()
         {
-            return "1.1";
+            return "1.2";
         }
         private readonly System.Random _rand = new();
         private List<int> collectCharms = new();
@@ -52,6 +52,7 @@ namespace RandomCharm
                 }
             }
             collectCharms = collectCharms.OrderBy(i => _rand.Next()).ToList();
+            
         }
         private void SetEquipped()
         {
