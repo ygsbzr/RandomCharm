@@ -63,7 +63,13 @@ namespace RandomCharm
             foreach(int num in collectCharms)
             {
                 PlayerData.instance.CalculateNotchesUsed();
-               
+               if(num==36)
+                {
+                    if(PlayerData.instance.royalCharmState<3)
+                    {
+                        continue;
+                    }
+                }
                     if (PlayerData.instance.GetInt("charmSlots")-1 > PlayerData.instance.GetInt("charmSlotsFilled"))
                     {
                         PlayerData.instance.SetBool($"equippedCharm_{num}", true);
