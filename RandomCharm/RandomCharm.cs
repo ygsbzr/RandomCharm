@@ -44,7 +44,7 @@ namespace RandomCharm
         private void CountCollect()
         {
             collectCharms.Clear();
-            for(int i = 1; i <=40 ; i++)
+            for(int i = 1; i <=PlayerData.instance.charmsOwned ; i++)
             {
                 if(PlayerData.instance.GetBool($"gotCharm_{i}"))
                 {
@@ -55,7 +55,7 @@ namespace RandomCharm
         }
         private void SetEquipped()
         {
-            for(int i = 0; i <=40; i++)
+            for(int i = 0; i <= PlayerData.instance.charmsOwned; i++)
             {
                 PlayerData.instance.SetBool($"equippedCharm_{i}", false);
                 PlayerData.instance.UnequipCharm(i);
