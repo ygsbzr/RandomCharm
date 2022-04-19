@@ -8,7 +8,7 @@ namespace RandomCharm
     {
         public override string GetVersion()
         {
-            return "1.2";
+            return "1.4";
         }
         private readonly System.Random _rand = new();
         private List<int> collectCharms = new();
@@ -27,10 +27,8 @@ namespace RandomCharm
                     FsmName: "Blue Health Control"
                 })
             {
-                self.GetState("Wait").AddMethod(() =>
-                {
-                    self.SendEvent("INVENTORY OPENED");//I hate this but it works
-                });
+                self.GetState("Wait").AddTransition(HutongGames.PlayMaker.FsmEvent.Finished, "Hive Check");
+                
             }
         }
 
@@ -38,6 +36,7 @@ namespace RandomCharm
         {
             orig(self);
             CountCollect();
+            RandomCollect();
             SetEquipped();
         }
 
@@ -51,8 +50,17 @@ namespace RandomCharm
                     collectCharms.Add(i);
                 }
             }
-            collectCharms = collectCharms.OrderBy(i => _rand.Next()).ToList();
-            
+        }
+        private void RandomCollect()
+        {
+           for(int i=collectCharms.Count-1;i>0;i--)
+            {
+                int pos = _rand.Next(i+1);
+                int temp=collectCharms[i];
+                collectCharms[i] = collectCharms[pos];
+                collectCharms[pos] = temp;
+
+            }
         }
         private void SetEquipped()
         {
@@ -61,7 +69,8 @@ namespace RandomCharm
                 PlayerData.instance.SetBool($"equippedCharm_{i}", false);
                 PlayerData.instance.UnequipCharm(i);
             }
-            foreach(int num in collectCharms)
+            PlayerData.instance.SetBool("overcharmed", false);
+            foreach (int num in collectCharms)
             {
                 PlayerData.instance.CalculateNotchesUsed();
                if(num==36)
@@ -79,19 +88,14 @@ namespace RandomCharm
                         if (PlayerData.instance.GetInt("charmSlotsFilled") > PlayerData.instance.GetInt("charmSlots"))
                         {
                             PlayerData.instance.SetBool("overcharmed", true);
+                        break;
                         }
-                    else
-                    {
-                        PlayerData.instance.SetBool("overcharmed",false);
-                        
-                    }
                     }
                 
             }
             if (HeroController.instance!=null)
             {
-                HeroController.instance.CharmUpdate();
-                HeroController.instance.proxyFSM.SendEvent("HeroCtrl-Healed");
+                CustomUpdate.CharmUpdate();
                 GameObject health = GameObject.Find("Health");
 
                 health.LocateMyFSM("Blue Health Control").SetState("Init");
