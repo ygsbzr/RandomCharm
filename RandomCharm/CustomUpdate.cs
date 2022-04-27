@@ -1,5 +1,6 @@
 ﻿using Modding;
-using GlobalEnums;
+using UnityEngine;
+using Vasi;
 namespace RandomCharm
 {
    public class CustomUpdate
@@ -37,6 +38,7 @@ namespace RandomCharm
 			}
 			if (hc.playerData.GetBool("equippedCharm_27"))
 			{
+				Count = 0;
 				hc.playerData.SetInt("joniHealthBlue",(int)((float)hc.playerData.GetInt("maxHealth") * 1.4f));
 				hc.playerData.SetInt("maxHealth",1);
 				hc.playerData.SetInt("prevHealth", hc.playerData.GetInt("health"));
@@ -44,12 +46,15 @@ namespace RandomCharm
 				PlayerData.instance.UpdateBlueHealth();
 				hc.playerData.SetInt("health",1);
 				ReflectionHelper.SetField(hc, "joniBeam", true);
+                ModHooks.TakeHealthHook += CountHeath;
 			}
 			else
 			{
 				if(PlayerData.instance.joniHealthBlue>0)
                 {
-					hc.playerData.SetInt("health", (int)((float)hc.playerData.GetInt("joniHealthBlue") / 1.4f));
+					hc.playerData.SetInt("health", hc.playerData.GetInt("maxHealth")-(int)(Count/1.4f));
+					ModHooks.TakeHealthHook -= CountHeath;
+					Count = 0;
 				}
 				hc.playerData.SetInt("joniHealthBlue",0);
 			}
@@ -62,6 +67,24 @@ namespace RandomCharm
 				hc.carefreeShieldEquipped = false;
 			}
 			hc.playerData.UpdateBlueHealth();
+			UpdateHealth();
 		}
-    }
+
+        private static int CountHeath(int damage)
+        {
+			Count += damage;
+			return damage;
+        }
+
+        private static void UpdateHealth()
+		{
+			GameObject Health = GameCameras.instance.hudCanvas.gameObject.Child("Health");
+			for (int i = 1; i <= hc.playerData.GetInt("maxHealth"); i++)
+			{
+				GameObject healthx = Health.Child($"Health {i}");
+				healthx.GetComponent<MeshRenderer>().enabled = true;
+			}
+		}
+		public static int Count = 0;
+	}
 }
