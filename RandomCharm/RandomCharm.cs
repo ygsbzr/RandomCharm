@@ -12,6 +12,7 @@ namespace RandomCharm
         }
         private readonly System.Random _rand = new();
         private List<int> collectCharms = new();
+        private List<int> equippedCharms = new();
         public override void Initialize()
         {
             On.GameManager.BeginScene += ChangeCharm;
@@ -65,6 +66,7 @@ namespace RandomCharm
         }
         private void SetEquipped()
         {
+            equippedCharms.Clear();
             for(int i = 0; i <= 100; i++)
             {
                 PlayerData.instance.SetBool($"equippedCharm_{i}", false);
@@ -74,25 +76,25 @@ namespace RandomCharm
             foreach (int num in collectCharms)
             {
                 PlayerData.instance.CalculateNotchesUsed();
-               if(num==36)
+                if (num == 36)
                 {
-                    if(PlayerData.instance.royalCharmState<3)
+                    if (PlayerData.instance.royalCharmState < 3)
                     {
                         continue;
                     }
                 }
-                    if (PlayerData.instance.GetInt("charmSlots")-1 > PlayerData.instance.GetInt("charmSlotsFilled"))
+                if (PlayerData.instance.GetInt("charmSlots") - 1 > PlayerData.instance.GetInt("charmSlotsFilled"))
+                {
+                    PlayerData.instance.SetBool($"equippedCharm_{num}", true);
+                    PlayerData.instance.EquipCharm(num);
+                    equippedCharms.Add(num);
+                    PlayerData.instance.CalculateNotchesUsed();
+                    if (PlayerData.instance.GetInt("charmSlotsFilled") > PlayerData.instance.GetInt("charmSlots"))
                     {
-                        PlayerData.instance.SetBool($"equippedCharm_{num}", true);
-                        PlayerData.instance.EquipCharm(num);
-                        PlayerData.instance.CalculateNotchesUsed();
-                        if (PlayerData.instance.GetInt("charmSlotsFilled") > PlayerData.instance.GetInt("charmSlots"))
-                        {
-                            PlayerData.instance.SetBool("overcharmed", true);
+                        PlayerData.instance.SetBool("overcharmed", true);
                         break;
-                        }
                     }
-                
+                }
             }
             if (HeroController.instance!=null)
             {
@@ -111,6 +113,13 @@ namespace RandomCharm
 
         private void DisplayEquipped()
         {
+            var holder = GameObject.Find("charm_dispaly_holder");
+            if (holder != null)
+            {
+                Log("Found existing holder.");
+                GameObject.DestroyObject(holder);
+            }
+            holder = new GameObject("charm_dispaly_holder");
             GameObject _GameCameras = null;
             foreach (var g in HeroController.instance.gameObject.scene.GetRootGameObjects())
             {
@@ -122,15 +131,18 @@ namespace RandomCharm
             var HudCamera = _GameCameras.transform.Find("HudCamera").gameObject;
             var Inventory = HudCamera.transform.Find("Inventory").gameObject;
             var Charms = Inventory.transform.Find("Charms").gameObject;
-            var Equipped_Charms = Charms.transform.Find("Equipped Charms").gameObject;
-            Charms = Equipped_Charms.transform.Find("Charms").gameObject;
-            for (int i = 0; i < Charms.transform.childCount; i++)
+            var Collected_Charms = Charms.transform.Find("Collected Charms").gameObject;
+            float x = 4;
+            foreach(var num in equippedCharms)
             {
-                var c = Charms.transform.GetChild(i).gameObject;
-                var newC = GameObject.Instantiate(c);
+                var c = Collected_Charms.transform.Find(num.ToString());
+                var newC = GameObject.Instantiate(c,holder.transform);
                 newC.transform.localScale = new Vector3(1, 1, 1);
                 var p = newC.transform.localPosition;
-                newC.transform.localPosition = new Vector3(p.x + 12.28f, p.y + 10.16f, p.z);
+                newC.transform.localPosition = new Vector3(x, 6.3f, p.z);
+                newC.name = c.name;
+                x += 1.5f;
+                newC.GetComponentInChildren<SpriteRenderer>().color = new Vector4(1, 1, 1, 1);
             }
         }
 
