@@ -38,6 +38,7 @@ namespace RandomCharm
             CountCollect();
             RandomCollect();
             SetEquipped();
+            DisplayEquipped();
         }
 
         private void CountCollect()
@@ -106,9 +107,31 @@ namespace RandomCharm
                 }
                 health.transform.Find("OC Backboard").gameObject.SetActive(PlayerData.instance.overcharmed);
             }
-           
-            
+        }
 
+        private void DisplayEquipped()
+        {
+            GameObject _GameCameras = null;
+            foreach (var g in HeroController.instance.gameObject.scene.GetRootGameObjects())
+            {
+                if (g.name == "_GameCameras")
+                {
+                    _GameCameras = g;
+                }
+            }
+            var HudCamera = _GameCameras.transform.Find("HudCamera").gameObject;
+            var Inventory = HudCamera.transform.Find("Inventory").gameObject;
+            var Charms = Inventory.transform.Find("Charms").gameObject;
+            var Equipped_Charms = Charms.transform.Find("Equipped Charms").gameObject;
+            Charms = Equipped_Charms.transform.Find("Charms").gameObject;
+            for (int i = 0; i < Charms.transform.childCount; i++)
+            {
+                var c = Charms.transform.GetChild(i).gameObject;
+                var newC = GameObject.Instantiate(c);
+                newC.transform.localScale = new Vector3(1, 1, 1);
+                var p = newC.transform.localPosition;
+                newC.transform.localPosition = new Vector3(p.x + 12.28f, p.y + 10.16f, p.z);
+            }
         }
 
         public void Unload()
