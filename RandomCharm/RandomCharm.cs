@@ -143,6 +143,7 @@ namespace RandomCharm
                 newC.name = c.name;
                 x += 1.5f;
                 newC.GetComponentInChildren<SpriteRenderer>().color = new Vector4(1, 1, 1, 1);
+                newC.GetComponentInChildren<SpriteRenderer>().enabled = true;
             }
         }
 
