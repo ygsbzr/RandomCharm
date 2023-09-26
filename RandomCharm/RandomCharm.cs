@@ -1,10 +1,10 @@
-﻿using Modding;
+using Modding;
 using System.Reflection;
 using UnityEngine;
 using Vasi;
 namespace RandomCharm
 {
-    public class RandomCharm:Mod,ITogglableMod
+    public class RandomCharm : Mod, ITogglableMod
     {
         public override string GetVersion()
         {
@@ -22,14 +22,13 @@ namespace RandomCharm
         private void SendInv(On.PlayMakerFSM.orig_Start orig, PlayMakerFSM self)
         {
             orig(self);
-            if(self is
+            if (self is
                 {
                     name: "Health",
                     FsmName: "Blue Health Control"
                 })
             {
                 self.GetState("Wait").AddTransition(HutongGames.PlayMaker.FsmEvent.Finished, "Hive Check");
-                
             }
         }
 
@@ -45,9 +44,9 @@ namespace RandomCharm
         private void CountCollect()
         {
             collectCharms.Clear();
-            for(int i = 1; i <=100; i++)
+            for (int i = 1; i <= 100; i++)
             {
-                if(PlayerData.instance.GetBool($"gotCharm_{i}"))
+                if (PlayerData.instance.GetBool($"gotCharm_{i}"))
                 {
                     collectCharms.Add(i);
                 }
@@ -55,10 +54,10 @@ namespace RandomCharm
         }
         private void RandomCollect()
         {
-           for(int i=collectCharms.Count-1;i>0;i--)
+            for (int i = collectCharms.Count - 1; i > 0; i--)
             {
-                int pos = _rand.Next(i+1);
-                int temp=collectCharms[i];
+                int pos = _rand.Next(i + 1);
+                int temp = collectCharms[i];
                 collectCharms[i] = collectCharms[pos];
                 collectCharms[pos] = temp;
 
@@ -67,7 +66,7 @@ namespace RandomCharm
         private void SetEquipped()
         {
             equippedCharms.Clear();
-            for(int i = 0; i <= 100; i++)
+            for (int i = 0; i <= 100; i++)
             {
                 PlayerData.instance.SetBool($"equippedCharm_{i}", false);
                 PlayerData.instance.UnequipCharm(i);
@@ -95,14 +94,18 @@ namespace RandomCharm
                         break;
                     }
                 }
+                else
+                {
+                    break;
+                }
             }
-            if (HeroController.instance!=null)
+            if (HeroController.instance != null)
             {
                 CustomUpdate.CharmUpdate();
                 GameObject health = GameObject.Find("Health");
 
                 health.LocateMyFSM("Blue Health Control").SetState("Init");
-                if(!GameManager.instance.sceneName.Contains("GG_Gruz_Mother"))//It didnt wake
+                if (!GameManager.instance.sceneName.Contains("GG_Gruz_Mother"))//It didnt wake
                 {
                     PlayMakerFSM.BroadcastEvent("CHARM INDICATOR CHECK");
                     PlayMakerFSM.BroadcastEvent("CHARM EQUIP CHECK");
@@ -133,10 +136,10 @@ namespace RandomCharm
             var Charms = Inventory.transform.Find("Charms").gameObject;
             var Collected_Charms = Charms.transform.Find("Collected Charms").gameObject;
             float x = 4;
-            foreach(var num in equippedCharms)
+            foreach (var num in equippedCharms)
             {
                 var c = Collected_Charms.transform.Find(num.ToString());
-                var newC = GameObject.Instantiate(c,holder.transform);
+                var newC = GameObject.Instantiate(c, holder.transform);
                 newC.transform.localScale = new Vector3(1, 1, 1);
                 var p = newC.transform.localPosition;
                 newC.transform.localPosition = new Vector3(x, 6.3f, p.z);
